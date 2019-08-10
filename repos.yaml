@@ -1,0 +1,13 @@
+repos:
+- id: /.*/ 
+workflows:
+  staging:
+    plan:
+      steps:
+      - run: TF_WORKSPACE=staging terraform init -input=false -no-color
+      - plan
+  production:
+    plan:
+      steps:
+      - run: TF_WORKSPACE=production terraform init -input=false -no-color
+      - plan
