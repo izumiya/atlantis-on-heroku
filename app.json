@@ -1,3 +1,32 @@
 {
-    "name": "Run Atlantis on Heroku"
+    "name": "Run Atlantis on Heroku",
+    "keywords": [
+        "terraform",
+        "atlantis",
+        "docker"
+    ],
+    "stack": "container",
+    "success_url": "/",
+    "env": {
+        "ATLANTIS_GITLAB_USER": {
+            "description": "GitLab username of API user."
+        },
+        "ATLANTIS_GITLAB_TOKEN": {
+            "description": "GitLab token of API user."
+        },
+        "ATLANTIS_GITLAB_WEBHOOK_SECRET": {
+            "description": "Optional secret used to validate GitLab webhooks. SECURITY WARNING: If not specified, Atlantis won't be able to validate that the incoming webhook call came from GitLab. This means that an attacker could spoof calls to Atlantis and cause it to perform malicious actions.",
+            "generator": "secret"
+        },
+        "ATLANTIS_REPO_WHITELIST": {
+            "description": "Comma separated list of repositories that Atlantis will operate on. The format is {hostname}/{owner}/{repo}, ex. github.com/runatlantis/atlantis. '*' matches any characters until the next comma."
+        },
+        "ATLANTIS_TFE_TOKEN": {
+            "description": "API token for Terraform Cloud/Enterprise."
+        },
+        "ATLANTIS_REPO_CONFIG": {
+            "description": "Path to a repo config file, used to customize how Atlantis runs on each repo.",
+            "value": "/repos.yaml"
+        }
+    }
 }
