@@ -27,6 +27,15 @@
         "ATLANTIS_REPO_CONFIG": {
             "description": "Path to a repo config file, used to customize how Atlantis runs on each repo.",
             "value": "/repos.yaml"
+        },
+        "ORGANIZATION": {
+            "description": "Organization for Terraform Cloud/Enterprise."
+        },
+        "AWS_ACCESS_KEY_ID": {
+            "description": "AWS access key"
+        },
+        "AWS_SECRET_ACCESS_KEY": {
+            "description": "AWS secret access key"
         }
     }
 }
