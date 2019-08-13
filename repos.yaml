@@ -1,13 +1,12 @@
 repos:
 - id: /.*/ 
+  allowed_overrides: [workflow,apply_requirements]
+  apply_requirements: [mergeable]
+
 workflows:
-  staging:
+  workspace:
     plan:
       steps:
-      - run: TF_WORKSPACE=staging terraform init -input=false -no-color
-      - plan
-  production:
-    plan:
-      steps:
-      - run: TF_WORKSPACE=production terraform init -input=false -no-color
+      - run: terraform init -input=false -no-color -backend-config="organization=$ORGANIZATION" || terraform workspace select -no-color $WORKSPACE || terraform workspace new -no-color $WORKSPACE
+      - init
       - plan
