@@ -31,11 +31,8 @@
         "ORGANIZATION": {
             "description": "Organization for Terraform Cloud/Enterprise."
         },
-        "AWS_ACCESS_KEY_ID": {
-            "description": "AWS access key"
-        },
-        "AWS_SECRET_ACCESS_KEY": {
-            "description": "AWS secret access key"
+        "GIT_CRYPT_ASC": {
+            "description": "git-crypt symmetric key with base64 encoding"
         }
     }
 }

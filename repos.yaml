@@ -7,6 +7,8 @@ workflows:
   workspace:
     plan:
       steps:
+      - run: echo "$GIT_CRYPT_ASC" | base64 --decode --output git-crypt.key
+      - run: git-crypt unlock git-crypt.key
       - run: terraform init -input=false -no-color -backend-config="organization=$ORGANIZATION" || terraform workspace select -no-color $WORKSPACE || terraform workspace new -no-color $WORKSPACE
       - init
       - plan
