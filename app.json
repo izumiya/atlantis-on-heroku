@@ -8,6 +8,34 @@
     "stack": "container",
     "success_url": "/",
     "env": {
+        "OAUTH2_PROXY_COOKIE_SECRET": {
+            "description": "the seed string for secure cookies",
+            "generator": "secret"
+        },
+        "OAUTH2_PROXY_COOKIE_DOMAIN": {
+            "description": "cookie domain to force cookies to",
+            "required": false
+        },
+        "OAUTH2_PROXY_CLIENT_ID": {
+            "description": "The OAuth Client ID"
+        },
+        "OAUTH2_PROXY_CLIENT_SECRET": {
+            "description": "The OAuth Client Secret"
+        },
+        "OAUTH2_PROXY_REDIRECT_URL": {
+            "description": "the OAuth Redirect URL"
+        },
+        "OAUTH2_PROXY_EMAIL_DOMAINS": {
+            "description": "the email domain used for authentication",
+            "value": "*"
+        },
+        "OAUTH2_PROXY_COOKIE_SECURE": {
+            "description": "secure cookies are only sent by the browser of a HTTPS connection (recommended)",
+            "value": true
+        },
+        "OAUTH2_PROXY_OIDC_ISSUER_URL": {
+            "description": "OpenID Connect Issuer URL"
+        },
         "ATLANTIS_GITLAB_USER": {
             "description": "GitLab username of API user."
         },
@@ -23,10 +51,6 @@
         },
         "ATLANTIS_TFE_TOKEN": {
             "description": "API token for Terraform Cloud/Enterprise."
-        },
-        "ATLANTIS_REPO_CONFIG": {
-            "description": "Path to a repo config file, used to customize how Atlantis runs on each repo.",
-            "value": "/repos.yaml"
         },
         "ORGANIZATION": {
             "description": "Organization for Terraform Cloud/Enterprise."

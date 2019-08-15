@@ -1,0 +1,72 @@
+upstream oauth2 {
+    # !!! NOT PRODUCTION SAFE !!!
+    # There is a bug here -- nginx only resolves DNS once on startup.  If the
+    # container moves after nginx starts, the traffic will no longer forward
+    # correctly.
+    server 127.0.0.1:4180;
+}
+
+upstream atlantis {
+    server 127.0.0.1:4141;
+}
+
+server {
+    listen 80;
+
+    location /oauth2 {
+        proxy_pass http://oauth2;
+
+        proxy_set_header Host                    $host;
+        proxy_set_header X-Real-IP               $remote_addr;
+        proxy_set_header X-Scheme                $scheme;
+        proxy_set_header X-Auth-Request-Redirect $request_uri;
+    }
+
+    location = /oauth2/auth {
+        proxy_pass http://oauth2;
+
+        proxy_set_header Host             $host;
+        proxy_set_header X-Real-IP        $remote_addr;
+        proxy_set_header X-Scheme         $scheme;
+        # nginx auth_request includes headers but not body
+        proxy_set_header Content-Length   "";
+        proxy_pass_request_body           off;
+    }
+
+    location / {
+        if ($request_method = POST) {
+            set $test A;
+        }
+        if ($uri = '/events') {
+            set $test "${test}B"; 
+        }
+        if ($test != AB) {
+            rewrite ^ /internal$uri last;
+        }
+        proxy_pass http://atlantis;
+    }
+
+    location /internal {
+        internal;
+
+        rewrite ^/internal(?<realurl>/.*)$ $realurl break;
+
+        auth_request /oauth2/auth;
+        error_page 401 = /oauth2/sign_in;
+
+        # pass information via X-User and X-Email headers to backend,
+        # requires running with --set-xauthrequest flag
+        auth_request_set $user   $upstream_http_x_auth_request_user;
+        auth_request_set $email  $upstream_http_x_auth_request_email;
+        proxy_set_header X-User  $user;
+        proxy_set_header X-Email $email;
+
+        # if you enabled --cookie-refresh, this is needed for it to work with auth_request
+        auth_request_set $auth_cookie $upstream_http_set_cookie;
+        add_header Set-Cookie $auth_cookie;
+
+        proxy_pass http://atlantis;
+    }
+}
+
+# vim: sw=4 sts=4 et ft=nginx

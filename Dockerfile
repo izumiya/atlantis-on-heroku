@@ -1,12 +1,20 @@
-FROM runatlantis/atlantis
-RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/sgerrand/alpine-pkg-git-crypt/master/sgerrand.rsa.pub \
-    && wget https://github.com/sgerrand/alpine-pkg-git-crypt/releases/download/0.6.0-r1/git-crypt-0.6.0-r1.apk \
-    && apk add git-crypt-0.6.0-r1.apk \
-    && rm -f git-crypt-0.6.0-r1.apk && rm -rf /var/cache/apk/*
-RUN { \
-    echo '#!/bin/sh'; \
-    echo 'atlantis server --port=$PORT'; \
-    } > /usr/local/bin/atlantis-server \
-    && chmod +x /usr/local/bin/atlantis-server
-COPY repos.yaml /repos.yaml
-CMD ["atlantis-server"]
+# The izumiya/atlantis-base is created by docker-base/Dockerfile.
+FROM izumiya/atlantis-base:latest
+
+RUN apk add --update supervisor && rm -rf /tmp/* /var/cache/apk/*
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+# supervisord
+COPY supervisord.conf /etc/
+# nginx
+COPY nginx/configs /etc/nginx
+COPY nginx/supervisor.conf /etc/supervisor/conf.d/nginx.conf
+# atlantis
+COPY atlantis/repos.yaml /etc/atlantis/repos.yaml
+COPY atlantis/supervisor.conf /etc/supervisor/conf.d/atlantis.conf
+# oauth2_proxy
+COPY oauth2_proxy/supervisor.conf /etc/supervisor/conf.d/oauth2_proxy.conf
+
+EXPOSE 80
+ENTRYPOINT [ "docker-entrypoint.sh" ]
+CMD [ "supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf" ]
