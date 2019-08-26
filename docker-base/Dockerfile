@@ -5,22 +5,6 @@ RUN wget https://github.com/pusher/oauth2_proxy/releases/download/v3.2.0/oauth2_
         && tar -xf /tmp/oauth2_proxy.tar.gz -C /bin --strip-components=1 \
         && rm /tmp/*.tar.gz
 
-FROM alpine:latest as git-crypt
-ENV VERSION 0.6.0
-RUN apk --update add \
-   bash \
-   curl \
-   git \
-   g++ \
-   make \
-   openssh \
-   openssl \
-   openssl-dev \
-   && rm -rf /var/cache/apk/*
-
-RUN curl -L https://github.com/AGWA/git-crypt/archive/$VERSION.tar.gz | tar zxv -C /var/tmp
-RUN cd /var/tmp/git-crypt-$VERSION && make && make install PREFIX=/usr/local
-
 FROM runatlantis/atlantis as nginx-atlantis
 
 ENV NGINX_VERSION 1.17.2
@@ -133,4 +117,17 @@ RUN set -x \
 
 # COPY
 COPY --from=oauth2_proxy /bin/oauth2_proxy-linux-amd64 /usr/local/bin/oauth2_proxy
-COPY --from=git-crypt /usr/local/bin/git-crypt /usr/local/bin/git-crypt
+
+# git-crypt
+ENV GIT_CRYPT_VERSION 0.6.0
+RUN apk add --no-cache \
+    bash \
+    curl \
+    git \
+    g++ \
+    make \
+    openssh \
+    openssl \
+    openssl-dev \
+    && curl -L https://github.com/AGWA/git-crypt/archive/$GIT_CRYPT_VERSION.tar.gz | tar zxv -C /var/tmp \
+    && cd /var/tmp/git-crypt-$GIT_CRYPT_VERSION && make && make install PREFIX=/usr/local
